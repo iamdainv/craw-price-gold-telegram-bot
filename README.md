@@ -26,8 +26,8 @@ A Node.js Express server for crawling and serving Vietnamese gold price data fro
 #### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd crawl-price-gold
+git clone https://github.com/iamdainv/craw-price-gold-telegram-bot.git
+cd craw-price-gold-telegram-bot
 ```
 
 #### 2. Install dependencies
