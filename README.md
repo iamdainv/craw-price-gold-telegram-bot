@@ -10,29 +10,33 @@ A Node.js Express server for crawling and serving Vietnamese gold price data fro
 - ✅ Beautiful formatted table display
 - ✅ RESTful API endpoints
 - ✅ Request logging and CORS support
+- ✅ Simple Docker deployment
 
 ## Requirements
 
-- Node.js 16+
-- NPM or Yarn
+- Node.js 16+ (for local development)
+- NPM or Yarn (for local development)
+- Docker (for containerized deployment)
 - Telegram Bot (created via [@BotFather](https://t.me/botfather))
 
 ## Setup
 
-### 1. Clone the repository
+### Option A: Local Development
+
+#### 1. Clone the repository
 
 ```bash
 git clone <repository-url>
 cd crawl-price-gold
 ```
 
-### 2. Install dependencies
+#### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Environment Configuration
+#### 3. Environment Configuration
 
 Create a `.env` file in the root directory with the following variables:
 
@@ -48,16 +52,7 @@ TELEGRAM_CHAT_ID=your_chat_id_here
 SOURCE_GOLD_PRICE_URL=https://www.24h.com.vn/gia-vang-hom-nay-c425.html
 ```
 
-#### Environment Variables Explanation:
-
-| Variable                | Description                | Example                                             | Required           |
-| ----------------------- | -------------------------- | --------------------------------------------------- | ------------------ |
-| `PORT`                  | Server port number         | `3000`                                              | No (default: 3000) |
-| `TELEGRAM_BOT_TOKEN`    | Bot token from @BotFather  | `123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ`              | **Yes**            |
-| `TELEGRAM_CHAT_ID`      | Your Telegram chat ID      | `1234567890`                                        | **Yes**            |
-| `SOURCE_GOLD_PRICE_URL` | Gold price data source URL | `https://www.24h.com.vn/gia-vang-hom-nay-c425.html` | No (has default)   |
-
-### 4. Telegram Bot Setup
+#### 4. Telegram Bot Setup
 
 1. **Create a Bot:**
 
@@ -71,7 +66,7 @@ SOURCE_GOLD_PRICE_URL=https://www.24h.com.vn/gia-vang-hom-nay-c425.html
    - Or send a message to your bot, then visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
    - Find your chat ID in the response
 
-### 5. Start the server
+#### 5. Start the server
 
 ```bash
 # Development
@@ -79,6 +74,26 @@ npm run dev
 
 # Production
 npm start
+```
+
+### Option B: Docker Deployment (Simple & Fast)
+
+#### 1. Quick Start (3 commands)
+
+```bash
+# 1. Build the image
+docker build -t gold-price-crawler .
+
+# 2. Run the container
+docker run -d --name gold-price-crawler \
+  -p 3000:3000 \
+  -e TELEGRAM_BOT_TOKEN=your_bot_token_here \
+  -e TELEGRAM_CHAT_ID=your_chat_id_here \
+  --restart unless-stopped \
+  gold-price-crawler
+
+# 3. Check if it's running
+docker logs gold-price-crawler
 ```
 
 ## API Endpoints
@@ -92,26 +107,17 @@ npm start
 
 ### API Examples
 
-#### Send Gold Price Alert
-
 ```bash
+# Test the API
+curl http://localhost:3000/
+
+# Get gold prices
+curl http://localhost:3000/api/telegram/gold-prices
+
+# Send price alert to Telegram
 curl -X POST http://localhost:3000/api/telegram/price-alert \
   -H "Content-Type: application/json" \
   -d '{"includeDetails": true}'
-```
-
-#### Get Raw Gold Price Data
-
-```bash
-curl http://localhost:3000/api/telegram/gold-prices
-```
-
-#### Send Test Message
-
-```bash
-curl -X POST http://localhost:3000/api/telegram/send-test \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello from Gold Price Crawler!"}'
 ```
 
 ## Project Structure
@@ -122,6 +128,8 @@ crawl-price-gold/
 ├── middleware/       # Express middleware
 ├── routes/          # API routes
 ├── utils/           # Utility functions
+├── Dockerfile        # Simple Docker image
+├── .dockerignore     # Docker exclusions
 ├── index.js         # Main server file
 ├── package.json     # Dependencies
 └── README.md        # This file
@@ -129,7 +137,7 @@ crawl-price-gold/
 
 ## Data Source
 
-The application fetches real-time gold price data from [24h.com.vn](https://www.24h.com.vn/gia-vang-hom-nay-c425.html), including:
+Real-time gold price data from [24h.com.vn](https://www.24h.com.vn/gia-vang-hom-nay-c425.html):
 
 - **SJC Gold**: Vietnam's most popular gold brand
 - **DOJI**: Major jewelry retailer prices
@@ -150,13 +158,8 @@ The application fetches real-time gold price data from [24h.com.vn](https://www.
 
    - Verify the source website is accessible
    - Check internet connection
-   - Ensure `SOURCE_GOLD_PRICE_URL` is valid
 
-3. **Server won't start:**
-   - Check if port is already in use
-   - Verify all required environment variables are set
-   - Ensure Node.js version is 16+
-
-## License
-
-This project is licensed under the ISC License.
+3. **Docker issues:**
+   - Ensure Docker is running: `docker info`
+   - Check container logs: `docker logs gold-price-crawler`
+   - Verify environment variables are set correctly
